@@ -59,6 +59,11 @@ class OrderController extends Controller
         return $this->success('', 'Order has been created');
     }
 
+    public function checkout(Request $request)
+    {
+        
+    }
+
     public function show($id)
     {
 
