@@ -54,7 +54,6 @@ class AuthController extends Controller
             'role_id'       => 2,
             'firstName'     => $request->firstName,
             'lastName'      => $request->lastName,
-            'gender'        => $request->gender,
             'email'         => $request->email,
             'password'      => Hash::make($request->password),
             'userImage'     => "default.png",
@@ -143,7 +142,7 @@ class AuthController extends Controller
             return $this->success('', 'link sent to your email');
         }
 
-        return $this->failed('', 'Your email is not registered', 500);
+        return $this->failed('', 'Your email is not registered', 401);
     }
 
     public function checkToken($email, $token)
@@ -154,7 +153,7 @@ class AuthController extends Controller
             return $this->success($token, 'Token is valid');
         }
 
-        return $this->failed('', 'Token is expired', 500);
+        return $this->failed('', 'Token is expired', 401);
     }
 
     public function resetPassword(Request $request)

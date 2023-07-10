@@ -24,7 +24,7 @@ class AddressController extends Controller
         if ($address->count() > 0) {
             return $this->success($address, 'Data Address');
         } else {
-            return $this->failed('', 'Address not found', 403);
+            return $this->failed('', 'Address not found', 404);
         }
     }
 
