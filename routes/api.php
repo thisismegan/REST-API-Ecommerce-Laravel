@@ -9,15 +9,14 @@ use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\RoleController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
+
 
 // Public Routes
 
 Route::group(['middleware' => 'allow-cors'], function () {
     Route::get('/', function () {
-        return response()->json([
-            'status' => 200,
-            'message' => "api end point"
-        ]);
+        return  "End Point API: " . URL::current();
     });
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);

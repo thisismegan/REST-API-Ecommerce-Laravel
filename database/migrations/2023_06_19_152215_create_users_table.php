@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('role_id')->constrained('roles', 'id');
             $table->string('firstName');
             $table->string('lastName');
+            $table->enum('gender', ['male', 'female'])->nullable();
             $table->string('email')->unique();
             $table->string('password');
             $table->string('userImage');
