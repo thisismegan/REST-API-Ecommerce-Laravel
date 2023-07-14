@@ -19,7 +19,12 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::with('image')->filter(request(['search']))->category(request(['category']))->get();
+
+        $limit = request('limit');
+
+        $limit ? $limit : $limit = 12;
+
+        $products = Product::with('image')->filter(request(['search']))->category(request(['category']))->limit($limit)->get();
 
         return $this->success($products, 'Data Products');
     }
