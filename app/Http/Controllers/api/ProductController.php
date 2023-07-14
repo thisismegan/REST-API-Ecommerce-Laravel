@@ -39,7 +39,7 @@ class ProductController extends Controller
             'quantity'     => $request->quantity,
             'price'        => $request->price,
             'weight'       => $request->weight,
-            'status'       => $request->status
+            'status'       => 'enable'
         ]);
 
 
