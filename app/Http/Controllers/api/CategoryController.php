@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -19,12 +20,22 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'categoryName' => 'required'
+            'categoryName'  => 'required',
+            'categoryImage' => 'required|image|mimes:jpeg,png,jpg,svg,webp,JPEG,PNG,JPG,SVG,WEBP',
         ]);
+
+        $file = $request->file('categoryImage');
+
+        $name = explode('.', $file->hashName())[0];
+        $extension = strtolower($file->getClientOriginalExtension());
+        $image = $name . "." . $extension;
+
+        $file->storeAs('public/category', $image);
 
 
         $category = Category::create([
-            'categoryName' => $request->categoryName
+            'categoryName'  => $request->categoryName,
+            'categoryImage' => $image,
         ]);
 
         return $this->success($category, 'Successfully');
@@ -48,9 +59,29 @@ class CategoryController extends Controller
 
         $category = Category::find($id);
 
-        $category->update([
-            'categoryName' => $request->categoryName
-        ]);
+        if ($request->hasFile('categoryImage')) {
+
+            Storage::delete('public/category/' . basename($category->categoryImage));
+
+
+            $file = $request->file('categoryImage');
+
+            $name = explode('.', $file->hashName())[0];
+            $extension = strtolower($file->getClientOriginalExtension());
+            $image = $name . "." . $extension;
+
+
+            $file->storeAs('public/category', $image);
+
+            $category->update([
+                'categoryName' => $request->categoryName,
+                'categoryImage' => $image
+            ]);
+        } else {
+            $category->update([
+                'categoryName' => $request->categoryName
+            ]);
+        }
 
         return $this->success($category, 'Updated Successfully');
     }
