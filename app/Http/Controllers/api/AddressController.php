@@ -22,7 +22,7 @@ class AddressController extends Controller
         $user_id = Auth::user()->id;
         $address = Address::where('user_id', $user_id)->get();
         if ($address->count() > 0) {
-            return $this->success($address, 'Data Address');
+            return $this->success($address, 'ok', 200);
         } else {
             return $this->failed('', 'Address not found', 404);
         }
@@ -47,7 +47,7 @@ class AddressController extends Controller
             'phoneNumber'   => $request->phoneNumber
         ]);
 
-        return $this->success($address, 'Successfully');
+        return $this->success($address, 'Successfully', 201);
     }
 
 
@@ -63,7 +63,7 @@ class AddressController extends Controller
         }
         return $this->success([
             'address' => $address
-        ], 'Request was successfully');
+        ], 'Request was successfully', 200);
     }
 
 
@@ -89,13 +89,13 @@ class AddressController extends Controller
 
         $address->update($request->all());
 
-        return $this->success(new AddressResource($address), 'Address has been updated');
+        return $this->success(new AddressResource($address), 'Address has been updated', 200);
     }
 
     public function destroy(Address $address)
     {
         $this->userAccess($address->user_id);
         $address->delete();
-        return $this->success(1, 'Successfully');
+        return $this->success('', 'Successfully', 200);
     }
 }

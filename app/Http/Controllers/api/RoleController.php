@@ -16,7 +16,7 @@ class RoleController extends Controller
     {
         $role = Role::all();
 
-        return $this->success($role, '');
+        return $this->success($role, 'ok', 200);
     }
 
     public function store(Request $request)
@@ -33,10 +33,6 @@ class RoleController extends Controller
             'roleName' => $request->roleName
         ]);
 
-        return response()->json([
-            'status' => 200,
-            'message' => 'Berhasil',
-            'data'    => $role
-        ], 200);
+        return $this->success($role, 'successfully', 201);
     }
 }

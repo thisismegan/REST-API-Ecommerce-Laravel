@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 trait HttpResponses
 {
 
-    protected function success($data, $message = null, $code = 200)
+    protected function success($data, $message = null, $code = null)
     {
         return response()->json([
             'status'  => $code,

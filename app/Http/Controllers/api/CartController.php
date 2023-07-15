@@ -16,7 +16,7 @@ class CartController extends Controller
     public function index()
     {
         $cart = CartResource::collection(Cart::where('user_id', Auth::user()->id)->get());
-        return $this->success($cart, 'List Cart');
+        return $this->success($cart, 'List Cart', 200);
     }
 
 
@@ -37,7 +37,7 @@ class CartController extends Controller
             'qty'        => $request->qty
         ]);
 
-        return $this->success($cart, 'Successfully Added Product to Cart');
+        return $this->success($cart, 'Successfully Added Product to Cart', 201);
     }
 
     public function update(Request $request, $id)
@@ -49,18 +49,18 @@ class CartController extends Controller
         if ($request->value == 'increment') {
 
             $cart->increment('qty');
-            return $this->success($cart, $message);
+            return $this->success($cart, $message, 201);
         } elseif ($request->value == 'decrement') {
 
             $cart->decrement('qty');
-            return $this->success($cart, $message);
+            return $this->success($cart, $message, 201);
         }
 
         $cart->qty += $request->qty;
 
         $cart->save();
 
-        return $this->success($cart, $message);
+        return $this->success($cart, $message, 201);
     }
 
     public function destroy($id)
@@ -69,6 +69,6 @@ class CartController extends Controller
 
         $cart->delete();
 
-        return $this->success('', 'Successfully');
+        return $this->success('', 'Successfully', 200);
     }
 }

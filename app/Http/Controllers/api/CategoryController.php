@@ -14,7 +14,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return $this->success(Category::all(), 'Categories');
+        return $this->success(Category::all(), 'Categories', 200);
     }
 
     public function store(Request $request)
@@ -38,7 +38,7 @@ class CategoryController extends Controller
             'categoryImage' => $image,
         ]);
 
-        return $this->success($category, 'Successfully');
+        return $this->success($category, 'Successfully', 201);
     }
 
 
@@ -46,7 +46,7 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
 
-        return $this->success($category, 'Data Category');
+        return $this->success($category, 'Category', 200);
     }
 
 
@@ -83,6 +83,6 @@ class CategoryController extends Controller
             ]);
         }
 
-        return $this->success($category, 'Updated Successfully');
+        return $this->success($category, 'Successfully', 201);
     }
 }

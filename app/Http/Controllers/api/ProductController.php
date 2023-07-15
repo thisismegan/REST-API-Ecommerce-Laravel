@@ -70,9 +70,8 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::where('id', $id)->first();
-
-        return $product ? $this->success(new ProductResource($product), 'Detail Product') : $this->failed('', 'Record Not Found', 404);
+        $product = Product::with('category', 'image')->where('id', $id)->first();
+        return $this->success($product, 'Detail Product');
     }
 
 

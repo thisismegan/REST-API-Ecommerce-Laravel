@@ -16,7 +16,15 @@ use Illuminate\Support\Facades\URL;
 
 Route::group(['middleware' => 'allow-cors'], function () {
     Route::get('/', function () {
-        return  "End Point API: " . URL::current();
+        return  response()->json([
+            'title'   => 'Sample Ecommerce APP API',
+            'end point' => URL::current(),
+            'contact' => [
+                'name' => 'API Support',
+                'email' => 'everythingaboutcode@gmail.com'
+            ],
+            'version' => "1.0.0"
+        ]);
     });
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);

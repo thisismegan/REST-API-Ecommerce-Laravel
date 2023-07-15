@@ -36,7 +36,7 @@ class AuthController extends Controller
                 return $this->success([
                     'user'  => $user,
                     'token' => $user->createToken('API TOKEN:' . $user->name)->plainTextToken
-                ], 'You are authenticated now!');
+                ], 'You are authenticated now!', 200);
             }
         } else {
             return $this->failed('', 'Credentials do not match', 401);
@@ -74,7 +74,7 @@ class AuthController extends Controller
         return $this->success([
             'user'    => $user,
             'token'   => $user->createToken('API Token: ' . $user->firstName)->plainTextToken
-        ], 'Please activate your account before login. Check your email');
+        ], 'Please activate your account before login. Check your email', 201);
     }
 
 
@@ -83,9 +83,7 @@ class AuthController extends Controller
         $user = Auth::user();
         $user->tokens()->where('tokenable_id', $user->id)->delete();
 
-        return $this->success([
-            'message' => 'You are successfully been logged out'
-        ]);
+        return $this->success('', 'ok', 200);
     }
 
     public function mailActivation($token)
@@ -101,13 +99,13 @@ class AuthController extends Controller
 
                 $userVerify->where('user_id', $user->id)->delete();
 
-                return $this->success('', 'Your email is Verified');
+                return $this->success('', 'Your email is Verified', 200);
             } else {
-                return $this->success('', 'Your email is already Verified');
+                return $this->success('', 'Your email is already Verified', 200);
             }
         }
 
-        return $this->failed('Email is not registered');
+        return $this->failed('', 'Email is not registered', 500);
     }
 
     public function forgotPassword(Request $request)
@@ -139,7 +137,7 @@ class AuthController extends Controller
             // sent mail reset password link
             Mail::to($request->email)->send(new SendPasswordReset($request->email, $token));
 
-            return $this->success('', 'link sent to your email');
+            return $this->success('', 'link sent to your email', 200);
         }
 
         return $this->failed('', 'Your email is not registered', 401);
@@ -150,7 +148,7 @@ class AuthController extends Controller
         $passwordReset =  PasswordReset::where('token', $token)->first();
 
         if ($passwordReset) {
-            return $this->success($token, 'Token is valid');
+            return $this->success($token, 'Token is valid', 201);
         }
 
         return $this->failed('', 'Token is expired', 401);
@@ -173,6 +171,6 @@ class AuthController extends Controller
         //delete token on table password_resets
         PasswordReset::where('email', $user->email)->delete();
 
-        return $this->success('', 'Success reset password');
+        return $this->success('', 'Success reset password', 200);
     }
 }

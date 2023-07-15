@@ -21,7 +21,7 @@ class UserController extends Controller
     public function index()
     {
         $user = UserResource::collection(User::all());
-        return $this->success($user, 'Request was successfully');
+        return $this->success($user, 'ok', 200);
     }
 
 
@@ -29,10 +29,10 @@ class UserController extends Controller
     {
         if (Auth::user()->role_id == 1) {
             $user = User::where('id', $id)->first();
-            return $this->success($user, 'Users');
+            return $this->success($user, 'ok', 200);
         } else {
             $user = User::where('id', Auth::user()->id)->first();
-            return $this->success($user, 'Account Information');
+            return $this->success($user, 'Account Information', 200);
         }
     }
 
@@ -78,7 +78,7 @@ class UserController extends Controller
             'userImage'     => $image
         ]);
 
-        return $this->success($user, 'User has been updated');
+        return $this->success($user, 'Successfully', 201);
     }
 
 
@@ -96,6 +96,6 @@ class UserController extends Controller
 
         $user->delete(); //delete user
 
-        return $this->success('', 'User has been deleted');
+        return $this->success('', 'User has been deleted', 200);
     }
 }

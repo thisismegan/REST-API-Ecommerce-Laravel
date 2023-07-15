@@ -22,7 +22,7 @@ class OrderController extends Controller
         }
 
         $orders = OrderResource::collection(Order::where('user_id', Auth::user()->id)->get());
-        return $this->success($orders, 'List Order');
+        return $this->success($orders, 'Orders', 200);
     }
 
     public function store(Request $request)
@@ -56,12 +56,11 @@ class OrderController extends Controller
             ]);
         }
 
-        return $this->success('', 'Order has been created');
+        return $this->success('', 'Successfully', 201);
     }
 
     public function checkout(Request $request)
     {
-        
     }
 
     public function show($id)
@@ -69,6 +68,6 @@ class OrderController extends Controller
 
         $order = new OrderResource(Order::where('id', $id)->where('user_id', Auth::user()->id)->first());
 
-        return $this->success($order, 'Detail Order');
+        return $this->success($order, 'Detail', 200);
     }
 }
