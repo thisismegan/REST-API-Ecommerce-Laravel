@@ -9,7 +9,6 @@ use App\Models\Image;
 use Illuminate\Validation\Rule;
 use App\Traits\HttpResponses;
 use App\Http\Requests\ProductStoreRequest;
-use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -24,9 +23,9 @@ class ProductController extends Controller
 
         $limit ? $limit : $limit = 12;
 
-        $products = Product::with('image')->filter(request(['search']))->category(request(['category']))->limit($limit)->get();
+        $products = Product::with('image')->search(request(['keyword']))->category(request(['category']))->limit($limit)->get();
 
-        return $this->success($products, 'Data Products');
+        return $this->success($products, 'Data Products', 200);
     }
 
 
@@ -64,14 +63,14 @@ class ProductController extends Controller
             ]);
         }
 
-        return $this->success($product, 'Successfully!');
+        return $this->success($product, 'Successfully!', 201);
     }
 
 
     public function show($id)
     {
         $product = Product::with('category', 'image')->where('id', $id)->first();
-        return $this->success($product, 'Detail Product');
+        return $this->success($product, 'Detail Product', 200);
     }
 
 
@@ -122,7 +121,7 @@ class ProductController extends Controller
             }
         }
 
-        return $this->success($product, 'Successfully Updated Product');
+        return $this->success($product, 'Successfully Updated Product', 201);
     }
 
     public function deleteImage(Request $request)
@@ -133,7 +132,7 @@ class ProductController extends Controller
 
         $image->delete();
 
-        return $this->success('', 'Sucesssfully');
+        return $this->success('', 'Sucesssfully', 200);
     }
 
     public function destroy($id)
@@ -152,6 +151,6 @@ class ProductController extends Controller
         //delete data product
         $product->delete();
 
-        return $this->success('', 'successfully!');
+        return $this->success('', 'successfully!', 200);
     }
 }

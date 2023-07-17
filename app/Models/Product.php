@@ -14,10 +14,10 @@ class Product extends Model
     protected $hidden = ['created_at', 'updated_at'];
 
 
-    public function scopeFilter(Builder $query, array $filter)
+    public function scopeSearch(Builder $query, array $filter)
     {
-        if ($filter['search'] ?? false) {
-            return $query->where('productName', 'like', '%' . $filter['search'] . '%')->orWhere('description', 'like', '%' . $filter['search'] . '%');
+        if ($filter['keyword'] ?? false) {
+            return $query->where('productName', 'like', '%' . $filter['keyword'] . '%')->orWhere('description', 'like', '%' . $filter['keyword'] . '%');
         }
     }
 

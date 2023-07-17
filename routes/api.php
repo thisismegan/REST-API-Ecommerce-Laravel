@@ -14,18 +14,18 @@ use Illuminate\Support\Facades\URL;
 
 // Public Routes
 
+Route::get('/', function () {
+    return  response()->json([
+        'title'   => 'Sample Ecommerce APP API',
+        'end point' => URL::current(),
+        'contact' => [
+            'name' => 'API Support',
+            'email' => 'everythingaboutcode@gmail.com'
+        ],
+        'version' => "1.0.0"
+    ]);
+});
 Route::group(['middleware' => 'allow-cors'], function () {
-    Route::get('/', function () {
-        return  response()->json([
-            'title'   => 'Sample Ecommerce APP API',
-            'end point' => URL::current(),
-            'contact' => [
-                'name' => 'API Support',
-                'email' => 'everythingaboutcode@gmail.com'
-            ],
-            'version' => "1.0.0"
-        ]);
-    });
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::get('activate/{token}', [AuthController::class, 'mailActivation'])->name('mail.activate');
@@ -37,8 +37,10 @@ Route::group(['middleware' => 'allow-cors'], function () {
 });
 
 
+
+
 // Protected Routes User
-Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
+Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('user', UserController::class);
     Route::apiResource('cart', CartController::class)->except(['create', 'show']);
     Route::apiResource('order', OrderController::class);
@@ -47,7 +49,7 @@ Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
 });
 
 // Protected Routes Only Admin
-Route::group(['middleware' => ['allow-cors', 'auth:sanctum', 'isAdmin']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'isAdmin']], function () {
     Route::apiResource('product', ProductController::class)->except(['index', 'show']);
     Route::apiResource('role', RoleController::class)->only(['index', 'store']);
     Route::get('user', [UserController::class, 'index']);
