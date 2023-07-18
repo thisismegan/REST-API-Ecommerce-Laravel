@@ -23,9 +23,16 @@ class ProductController extends Controller
 
         $limit ? $limit : $limit = 12;
 
+
         $products = Product::with('image')->search(request(['keyword']))->category(request(['category']))->limit($limit)->get();
 
-        return $this->success($products, 'Data Products', 200);
+        $data = [
+            'products' => $products,
+            'total'    => Product::all()->count()
+        ];
+
+
+        return $this->success($data, 'Data Products', 200);
     }
 
 
