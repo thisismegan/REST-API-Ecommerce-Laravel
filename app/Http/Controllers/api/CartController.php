@@ -4,10 +4,10 @@ namespace App\Http\Controllers\api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
+
 
 class CartController extends Controller
 {
@@ -15,10 +15,10 @@ class CartController extends Controller
 
     public function index()
     {
-        $cart = CartResource::collection(Cart::where('user_id', Auth::user()->id)->get());
+
+        $cart = Cart::with('product', 'product.thumbnail')->where('user_id', Auth::user()->id)->get();
         return $this->success($cart, 'List Cart', 200);
     }
-
 
     public function store(Request $request)
     {
@@ -28,13 +28,13 @@ class CartController extends Controller
 
         if ($cart) {
             $cart->increment('qty');
-            return $this->success($cart, 'Successfully added product to cart');
+            return $this->success($cart, 'Successfully added product to cart', 200);
         }
 
         $cart =  Cart::create([
-            'user_id'    => $user_id,
+            'user_id'    => $request->user_id,
             'product_id' => $request->product_id,
-            'qty'        => $request->qty
+            'qty'        => 1
         ]);
 
         return $this->success($cart, 'Successfully Added Product to Cart', 201);

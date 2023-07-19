@@ -32,10 +32,11 @@ class AuthController extends Controller
             } else {
 
                 $user = User::where('email', $request->email)->first();
+                $token = $user->createToken('API TOKEN:' . $user->name)->plainTextToken;
 
                 return $this->success([
                     'user'  => $user,
-                    'token' => $user->createToken('API TOKEN:' . $user->name)->plainTextToken
+                    'token' => $token
                 ], 'You are authenticated now!', 200);
             }
         } else {

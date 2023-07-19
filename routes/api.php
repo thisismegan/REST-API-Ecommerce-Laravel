@@ -37,8 +37,6 @@ Route::group(['middleware' => 'allow-cors'], function () {
 });
 
 
-
-
 // Protected Routes User
 Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
     Route::apiResource('user', UserController::class);
@@ -52,7 +50,6 @@ Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
 Route::group(['middleware' => ['allow-cors', 'auth:sanctum', 'isAdmin']], function () {
     Route::apiResource('product', ProductController::class)->except(['index', 'show']);
     Route::apiResource('role', RoleController::class)->only(['index', 'store']);
-    Route::get('user', [UserController::class, 'index']);
     Route::apiResource('category', CategoryController::class)->except(['index', 'show']);
     Route::post('delete_image', [ProductController::class, 'deleteImage']);
 });

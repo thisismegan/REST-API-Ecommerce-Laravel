@@ -33,6 +33,11 @@ class Product extends Model
         return $this->hasMany(Image::class);
     }
 
+    public function thumbnail()
+    {
+        return $this->hasOne(Image::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -40,7 +45,7 @@ class Product extends Model
 
     public function cart()
     {
-        return $this->hasMany(Cart::class);
+        return $this->hasManyThrough(Cart::class, Image::class);
     }
 
     public function order_detail()

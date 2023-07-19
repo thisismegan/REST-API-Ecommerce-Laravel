@@ -20,7 +20,12 @@ class UserController extends Controller
 
     public function index()
     {
-        $user = UserResource::collection(User::all());
+        if (Auth::user()->role_id == 2) {
+            $user = User::where('id', Auth::user()->id)->first();
+        } else {
+            $user = UserResource::collection(User::all());
+        }
+
         return $this->success($user, 'ok', 200);
     }
 
