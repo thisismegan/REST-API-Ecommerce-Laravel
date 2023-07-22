@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class RajaongkirController extends Controller
 {
-    protected $API = '2c9a30c9a56275065f07574b67615d40';
+    protected $API = 'b1c35ebae7efc737a060085cc8bfb85f';
 
 
     public function getProvince()
@@ -35,5 +35,15 @@ class RajaongkirController extends Controller
         ], 200);
     }
 
-    
+    public function getPostalCode($id)
+    {
+        $response = Http::withHeaders([
+            'key' => $this->API
+        ])->get('https://api.rajaongkir.com/starter/city?id=' . $id);
+
+        return response()->json([
+            'status' => 200,
+            'data'   => $response['rajaongkir']['results']
+        ], 200);
+    }
 }

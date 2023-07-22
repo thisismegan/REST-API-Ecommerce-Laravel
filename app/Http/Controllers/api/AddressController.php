@@ -24,7 +24,7 @@ class AddressController extends Controller
         if ($address->count() > 0) {
             return $this->success($address, 'ok', 200);
         } else {
-            return $this->failed('', 'Address not found', 404);
+            return $this->failed('', 'Address not found', 200);
         }
     }
 
@@ -33,8 +33,6 @@ class AddressController extends Controller
     {
 
         $request->validated($request->all());
-
-
         $user = User::where('email', Auth::user()->email)->first();
 
         $address = Address::create([
@@ -42,7 +40,6 @@ class AddressController extends Controller
             'name'          => $request->name,
             'province'      => $request->province,
             'regency'       => $request->regency,
-            'district'      => $request->district,
             'postalCode'    => $request->postalCode,
             'fullAddress'   => $request->fullAddress,
             'phoneNumber'   => $request->phoneNumber
@@ -78,7 +75,6 @@ class AddressController extends Controller
             'name'        => 'required',
             'province'    => 'required',
             'regency'     => 'required',
-            'district'    => 'required',
             'postalCode'  => 'required|numeric',
             'fullAddress' => 'required',
             'phoneNumber' => 'required|numeric'

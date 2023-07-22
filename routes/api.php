@@ -47,6 +47,7 @@ Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
     Route::apiResource('address', AddressController::class);
     Route::get('province', [RajaongkirController::class, 'getProvince']);
     Route::get('city/{id}', [RajaongkirController::class, 'getCity']);
+    Route::get('postalcode/{id}', [RajaongkirController::class, 'getPostalCode']);
 });
 
 // Protected Routes Only Admin
