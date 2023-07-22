@@ -48,39 +48,41 @@ class UserController extends Controller
             return $this->failed('', "Access Denied!", 401);
         }
 
+        if ($request->hasFile('userImage')) {
+            $file = $request->file('userImage');
+            $name = explode('.', $file->hashName())[0];
+            $extension = strtolower($file->getClientOriginalExtension());
+            $image = $name . "." . $extension;
+
+
+            $file->storeAs('public/user', $image); //upload image profile
+
+            $old_imageUser = $user['userImage'];
+
+            if ($old_imageUser != 'default.png') {
+                Storage::delete('public/user/' . $old_imageUser);
+            }
+
+            $user->userImage = $image;
+            $user->save();
+
+            return $this->success('', 'Successfully', 201);
+        }
+
         $validator = Validator::make($request->all(), [
             'firstName'     => 'required|max:15',
             'lastName'      => 'required|max:15',
             'gender'        => 'required',
-            'userImage'     => 'required|image|mimes:jpeg,png,jpg,svg,gif,JPEG,PNG,JPG,SVG,GIF'
         ]);
 
         if ($validator->fails()) {
             return $this->failed('', $validator->errors(), 401);
         }
 
-
-        $file = $request->file('userImage');
-
-
-        $name = explode('.', $file->hashName())[0];
-        $extension = strtolower($file->getClientOriginalExtension());
-        $image = $name . "." . $extension;
-
-
-        $file->storeAs('public/user', $image); //upload image profile
-
-        $old_imageUser = $user['userImage'];
-
-        if ($old_imageUser != 'default.png') {
-            Storage::delete('public/user/' . $old_imageUser);
-        }
-
         $user->update([
             'firstName'     => $request->firstName,
             'lastName'      => $request->lastName,
             'gender'        => $request->gender,
-            'userImage'     => $image
         ]);
 
         return $this->success($user, 'Successfully', 201);

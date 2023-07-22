@@ -6,6 +6,7 @@ use App\Http\Controllers\api\CartController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\OrderController;
+use App\Http\Controllers\api\RajaongkirController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,8 @@ Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
     Route::apiResource('order', OrderController::class);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::apiResource('address', AddressController::class);
+    Route::get('province', [RajaongkirController::class, 'getProvince']);
+    Route::get('city/{id}', [RajaongkirController::class, 'getCity']);
 });
 
 // Protected Routes Only Admin
