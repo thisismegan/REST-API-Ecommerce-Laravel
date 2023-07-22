@@ -39,9 +39,10 @@ class AddressController extends Controller
 
         $address = Address::create([
             'user_id'       => $user->id,
+            'name'          => $request->name,
             'province'      => $request->province,
             'regency'       => $request->regency,
-            'subdistrict'   => $request->subdistrict,
+            'district'      => $request->district,
             'postalCode'    => $request->postalCode,
             'fullAddress'   => $request->fullAddress,
             'phoneNumber'   => $request->phoneNumber
@@ -74,9 +75,10 @@ class AddressController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
+            'name'        => 'required',
             'province'    => 'required',
             'regency'     => 'required',
-            'subdistrict' => 'required',
+            'district'    => 'required',
             'postalCode'  => 'required|numeric',
             'fullAddress' => 'required',
             'phoneNumber' => 'required|numeric'
@@ -99,4 +101,3 @@ class AddressController extends Controller
         return $this->success('', 'Successfully', 200);
     }
 }
-    
