@@ -24,10 +24,9 @@ class AddressStoreRequest extends FormRequest
     public function rules()
     {
         return [
+            'name'        => 'required',
             'province'    => 'required',
             'regency'     => 'required',
-            'subdistrict' => 'required',
-            'postalCode'  => 'required|numeric',
             'fullAddress' => 'required',
             'phoneNumber' => 'required|numeric'
         ];

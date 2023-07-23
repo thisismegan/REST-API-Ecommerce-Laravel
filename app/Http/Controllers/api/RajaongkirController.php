@@ -3,47 +3,42 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Http;
+use App\Models\City;
+use App\Models\Province;
 
 class RajaongkirController extends Controller
 {
-    protected $API = 'b1c35ebae7efc737a060085cc8bfb85f';
-
 
     public function getProvince()
     {
 
-        $response = Http::withHeaders([
-            'key' => $this->API
-        ])->get('https://api.rajaongkir.com/starter/province');
+        $province = Province::all();
 
         return response()->json([
             'status' => 200,
-            'data'   => $response['rajaongkir']['results']
+            'data'   => $province
         ], 200);
     }
 
     public function getCity($id)
     {
-        $response = Http::withHeaders([
-            'key' => $this->API
-        ])->get('https://api.rajaongkir.com/starter/city?province=' . $id);
+
+        $city = City::where('province_id', $id)->get();
 
         return response()->json([
             'status' => 200,
-            'data'   => $response['rajaongkir']['results']
+            'data'   => $city
         ], 200);
     }
 
     public function getPostalCode($id)
     {
-        $response = Http::withHeaders([
-            'key' => $this->API
-        ])->get('https://api.rajaongkir.com/starter/city?id=' . $id);
+
+        $postal_code = City::where('city_id', $id)->first();
 
         return response()->json([
             'status' => 200,
-            'data'   => $response['rajaongkir']['results']
+            'data'   => $postal_code
         ], 200);
     }
 }

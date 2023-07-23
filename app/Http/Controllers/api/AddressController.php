@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AddressStoreRequest;
 use App\Http\Resources\AddressResource;
 use App\Models\Address;
-use App\Models\User;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -19,8 +18,7 @@ class AddressController extends Controller
 
     public function index()
     {
-        $user_id = Auth::user()->id;
-        $address = Address::where('user_id', $user_id)->get();
+        $address = Address::where('user_id', Auth::user()->id)->get();
         if ($address->count() > 0) {
             return $this->success($address, 'ok', 200);
         } else {
@@ -33,14 +31,12 @@ class AddressController extends Controller
     {
 
         $request->validated($request->all());
-        $user = User::where('email', Auth::user()->email)->first();
 
         $address = Address::create([
-            'user_id'       => $user->id,
+            'user_id'       => Auth::user()->id,
             'name'          => $request->name,
             'province'      => $request->province,
             'regency'       => $request->regency,
-            'postalCode'    => $request->postalCode,
             'fullAddress'   => $request->fullAddress,
             'phoneNumber'   => $request->phoneNumber
         ]);
@@ -52,9 +48,7 @@ class AddressController extends Controller
     public function show($id)
     {
 
-        $user_id = Auth::user()->id;
-
-        $address = Address::where('id', $id)->where('user_id', $user_id)->get();
+        $address = Address::where('id', $id)->where('user_id', Auth::user()->id)->get();
 
         if ($address->count() < 1) {
             return $this->failed('', 'Address not found', 404);
@@ -75,7 +69,6 @@ class AddressController extends Controller
             'name'        => 'required',
             'province'    => 'required',
             'regency'     => 'required',
-            'postalCode'  => 'required|numeric',
             'fullAddress' => 'required',
             'phoneNumber' => 'required|numeric'
         ]);
