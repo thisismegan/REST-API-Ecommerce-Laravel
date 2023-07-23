@@ -35,8 +35,7 @@ class AddressController extends Controller
         $address = Address::create([
             'user_id'       => Auth::user()->id,
             'name'          => $request->name,
-            'province'      => $request->province,
-            'regency'       => $request->regency,
+            'city_id'       => $request->city_id,
             'fullAddress'   => $request->fullAddress,
             'phoneNumber'   => $request->phoneNumber
         ]);
@@ -67,8 +66,7 @@ class AddressController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name'        => 'required',
-            'province'    => 'required',
-            'regency'     => 'required',
+            'city_id'     => 'required',
             'fullAddress' => 'required',
             'phoneNumber' => 'required|numeric'
         ]);
