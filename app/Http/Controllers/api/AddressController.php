@@ -18,7 +18,7 @@ class AddressController extends Controller
 
     public function index()
     {
-        $address = Address::where('user_id', Auth::user()->id)->get();
+        $address = Address::with('city')->where('user_id', Auth::user()->id)->get();
         if ($address->count() > 0) {
             return $this->success($address, 'ok', 200);
         } else {

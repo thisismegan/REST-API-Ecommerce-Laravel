@@ -25,7 +25,7 @@ class AddressStoreRequest extends FormRequest
     {
         return [
             'name'        => 'required',
-            'user_id'     => 'required',
+            'city_id'     => 'required',
             'fullAddress' => 'required',
             'phoneNumber' => 'required|numeric'
         ];

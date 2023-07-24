@@ -78,6 +78,25 @@ class AuthController extends Controller
         ], 'Please activate your account before login. Check your email', 201);
     }
 
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'password'     => 'required|confirmed|min:8'
+        ]);
+
+        if (!Hash::check($request->old_password, Auth::user()->password)) {
+            return $this->failed('', 'Kata Sandi yang anda masukkan salah', 401);
+        }
+
+        $user = User::find(Auth::id());
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return $this->success('', 'Kata sandi berhasil diubah', 200);
+    }
+
 
     public function logout()
     {

@@ -39,7 +39,7 @@ trait HttpResponses
 
     protected function userAccess($request)
     {
-        if (Auth::user()->id !== $request) {
+        if (Auth::id() !== $request) {
             return $this->failed('', "Access Denied!", 401);
         }
     }

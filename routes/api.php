@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\URL;
 
 Route::get('/', function () {
     return  response()->json([
-        'title'   => 'Sample Ecommerce APP API',
+        'title'   => 'Sample Ecommerce API',
         'end point' => URL::current(),
         'contact' => [
             'name' => 'API Support',
@@ -48,6 +48,7 @@ Route::group(['middleware' => ['allow-cors', 'auth:sanctum']], function () {
     Route::get('province', [RajaongkirController::class, 'getProvince']);
     Route::get('city/{id}', [RajaongkirController::class, 'getCity']);
     Route::get('postalcode/{id}', [RajaongkirController::class, 'getPostalCode']);
+    Route::post('changepassword', [AuthController::class, 'changePassword']);
 });
 
 // Protected Routes Only Admin
