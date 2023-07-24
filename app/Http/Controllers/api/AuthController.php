@@ -11,11 +11,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MailVerify;
-use App\Mail\SendPasswordReset;
+use Illuminate\Support\Facades\Password as ForgotPassword;
 use App\Models\PasswordReset;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use App\Http\Requests\Auth\ChangePasswordRequest;
+use Illuminate\Auth\Events\PasswordReset as EventsPasswordReset;
 
 class AuthController extends Controller
 {
@@ -48,8 +52,6 @@ class AuthController extends Controller
     public function register(RegisterUserRequest $request)
     {
 
-        $request->validated($request->all());
-
         // input data to users table
         $user = User::create([
             'role_id'       => 2,
@@ -78,12 +80,8 @@ class AuthController extends Controller
         ], 'Please activate your account before login. Check your email', 201);
     }
 
-    public function changePassword(Request $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
-        $request->validate([
-            'old_password' => 'required',
-            'password'     => 'required|confirmed|min:8'
-        ]);
 
         if (!Hash::check($request->old_password, Auth::user()->password)) {
             return $this->failed('', 'Kata Sandi yang anda masukkan salah', 401);
@@ -98,10 +96,14 @@ class AuthController extends Controller
     }
 
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $user = Auth::user();
-        $user->tokens()->where('tokenable_id', $user->id)->delete();
+        EnsureFrontendRequestsAreStateful::fromFrontend($request);
+
+        // $user = Auth::user();
+        // $user->tokens()->where('tokenable_id', $user->id)->delete();
+
+        $request->user()->currentAccessToken()->delete();
 
         return $this->success('', 'ok', 200);
     }
@@ -130,67 +132,44 @@ class AuthController extends Controller
 
     public function forgotPassword(Request $request)
     {
-        //validate email request
-        $request->validate([
-            'email' => 'required|email'
-        ]);
+        $request->validate(['email' => 'required|email']);
 
-
-        //check email is registered
-        $user = User::where('email', $request->email)->first();
-
-        if ($user) {
-            //delete old token if exist
-            PasswordReset::where('email', $user->email)->delete();
-
-            //create token
-            $token = Str::random(80);
-
-            //input data reset password
-            PasswordReset::create([
-                'email' => $user->email,
-                'token' => $token,
-                'created_at' => Date('Y-m-d H:i:s')
-            ]);
-
-
-            // sent mail reset password link
-            Mail::to($request->email)->send(new SendPasswordReset($request->email, $token));
-
-            return $this->success('', 'link sent to your email', 200);
-        }
-
-        return $this->failed('', 'Your email is not registered', 401);
+        $status = ForgotPassword::sendResetLink(
+            $request->only('email')
+        );
+        return $status === ForgotPassword::RESET_LINK_SENT
+            ? $this->success('', 'Link reset password telah dikirim', 200)
+            : $this->failed('', 'Email tidak terdaftar', 401);
     }
 
-    public function checkToken($email, $token)
+    public function resetPassword($token)
     {
-        $passwordReset =  PasswordReset::where('token', $token)->first();
-
-        if ($passwordReset) {
-            return $this->success($token, 'Token is valid', 201);
-        }
-
-        return $this->failed('', 'Token is expired', 401);
+        return redirect('http://localhost:5173/resetpassword/' . $token);
     }
 
-    public function resetPassword(Request $request)
+    public function updatePassword(Request $request)
     {
         $request->validate([
-            'token'         => 'required',
-            'email'         => 'required|email',
-            'password'      => 'required|min:8|confirmed'
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed'
         ]);
 
-        $passwordReset = PasswordReset::where('token', $request->token)->first();
+        $status = ForgotPassword::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
 
-        $user = User::where('email', $passwordReset->email)->first();
-        $user->password = Hash::make($request->password);
-        $user->save();
+                $user->save();
 
-        //delete token on table password_resets
-        PasswordReset::where('email', $user->email)->delete();
+                event(new EventsPasswordReset($user));
+            }
+        );
 
-        return $this->success('', 'Success reset password', 200);
+        return $status === ForgotPassword::PASSWORD_RESET
+            ? $this->success('', 'Berhasil perbaharui Kata Sandi', 201)
+            : $this->failed('', 'Email tidak terdaftar', 401);
     }
 }

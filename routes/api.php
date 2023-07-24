@@ -30,9 +30,9 @@ Route::group(['middleware' => 'allow-cors'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::get('activate/{token}', [AuthController::class, 'mailActivation'])->name('mail.activate');
-    Route::post('forgot_password', [AuthController::class, 'forgotPassword']);
-    Route::get('check_token/{email}/{token}', [AuthController::class, 'checkToken'])->name('check_token');
-    Route::post('reset_password', [AuthController::class, 'resetPassword']);
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('guest')->name('password.email');
+    Route::get('reset-password/{token}', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
+    Route::post('reset-password', [AuthController::class, 'updatePassword'])->middleware('guest')->name('password.update');
     Route::apiResource('product', ProductController::class)->only(['index', 'show']);
     Route::apiResource('category', CategoryController::class)->only(['index', 'show']);
 });

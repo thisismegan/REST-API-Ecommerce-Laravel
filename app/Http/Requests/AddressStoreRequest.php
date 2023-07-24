@@ -30,4 +30,15 @@ class AddressStoreRequest extends FormRequest
             'phoneNumber' => 'required|numeric'
         ];
     }
+
+
+    public function messages(): array
+    {
+        return [
+            'name.required'         => 'Kolom nama tidak boleh kosong',
+            'city_id.required'      => 'Anda belum memilih kota',
+            'fullAddress.required'  => 'Kolom alamat tidak boleh kosong',
+            'phoneNumber.required'  => 'Kolom No.HP tidak boleh kosong'
+        ];
+    }
 }
