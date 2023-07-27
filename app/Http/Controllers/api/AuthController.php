@@ -12,14 +12,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MailVerify;
 use Illuminate\Support\Facades\Password as ForgotPassword;
-use App\Models\PasswordReset;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use App\Http\Requests\Auth\ChangePasswordRequest;
 use Illuminate\Auth\Events\PasswordReset as EventsPasswordReset;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -28,24 +26,20 @@ class AuthController extends Controller
     public function login(LoginUserRequest $request)
     {
 
-        $request->validated($request->all());
+        $user = User::where('email', $request->email)->first();
 
-        if (Auth::attempt($request->only(['email', 'password']))) {
-            if (Auth::user()->email_verified_at == NULL) {
-                return $this->failed('', 'Your account not activate', 401);
-            } else {
-
-                $user = User::where('email', $request->email)->first();
-                $token = $user->createToken('API TOKEN:' . $user->name)->plainTextToken;
-
-                return $this->success([
-                    'user'  => $user,
-                    'token' => $token
-                ], 'You are authenticated now!', 200);
-            }
-        } else {
-            return $this->failed('', 'Credentials do not match', 401);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Credentials do not match.'],
+            ]);
         }
+
+        $token = $user->createToken('API TOKEN:' . $user->firstName)    ->plainTextToken;
+
+        return $this->success([
+            'user' => $user,
+            'token' => $token
+        ], 'User', 200);
     }
 
 
@@ -80,34 +74,6 @@ class AuthController extends Controller
         ], 'Please activate your account before login. Check your email', 201);
     }
 
-    public function changePassword(ChangePasswordRequest $request)
-    {
-
-        if (!Hash::check($request->old_password, Auth::user()->password)) {
-            return $this->failed('', 'Kata Sandi yang anda masukkan salah', 401);
-        }
-
-        $user = User::find(Auth::id());
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        return $this->success('', 'Kata sandi berhasil diubah', 200);
-    }
-
-
-    public function logout(Request $request)
-    {
-        EnsureFrontendRequestsAreStateful::fromFrontend($request);
-
-        // $user = Auth::user();
-        // $user->tokens()->where('tokenable_id', $user->id)->delete();
-
-        $request->user()->currentAccessToken()->delete();
-
-        return $this->success('', 'ok', 200);
-    }
-
     public function mailActivation($token)
     {
 
@@ -127,8 +93,24 @@ class AuthController extends Controller
             }
         }
 
-        return $this->failed('', 'Email is not registered', 500);
+        return $this->failed('', 'Token is expired', 500);
     }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+
+        if (!Hash::check($request->old_password, Auth::user()->password)) {
+            return $this->failed('', 'Kata Sandi yang anda masukkan salah', 401);
+        }
+
+        $user = User::find(Auth::id());
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return $this->success('', 'Kata sandi berhasil diubah', 200);
+    }
+
 
     public function forgotPassword(Request $request)
     {
@@ -171,5 +153,13 @@ class AuthController extends Controller
         return $status === ForgotPassword::PASSWORD_RESET
             ? $this->success('', 'Berhasil perbaharui Kata Sandi', 201)
             : $this->failed('', 'Email tidak terdaftar', 401);
+    }
+
+    public function logout(Request $request)
+    {
+
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->success('', 'ok', 200);
     }
 }

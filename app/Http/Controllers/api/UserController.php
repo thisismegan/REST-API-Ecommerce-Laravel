@@ -49,6 +49,11 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('userImage')) {
+            $request->validate([
+                'userImage' => 'image|file|max:1024'
+            ]);
+
+
             $file = $request->file('userImage');
             $name = explode('.', $file->hashName())[0];
             $extension = strtolower($file->getClientOriginalExtension());
