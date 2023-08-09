@@ -15,7 +15,6 @@ class CartController extends Controller
 
     public function index()
     {
-
         $cart = Cart::with('product', 'product.thumbnail')->where('user_id', Auth::user()->id)->get();
         return $this->success($cart, 'List Cart', 200);
     }
@@ -43,24 +42,27 @@ class CartController extends Controller
     public function update(Request $request, $id)
     {
         $cart = Cart::find($id);
-
-        $message = 'Successfully Added Product to Cart';
+        $stock = $cart->product->quantity;
 
         if ($request->value == 'increment') {
+            // check stock product. cart qty not more than product quantity
+            if ($cart->qty >= $stock) {
+                return $this->failed('', 'Melebihi stok produk', 400);
+            }
 
             $cart->increment('qty');
-            return $this->success($cart, $message, 201);
+            return $this->success($cart, 'ok', 201);
         } elseif ($request->value == 'decrement') {
 
             $cart->decrement('qty');
-            return $this->success($cart, $message, 201);
+            return $this->success($cart, 'ok', 201);
         }
 
-        $cart->qty += $request->qty;
+        $cart->qty = $request->qty;
 
         $cart->save();
 
-        return $this->success($cart, $message, 201);
+        return $this->success($cart, 'ok', 201);
     }
 
     public function destroy($id)
@@ -70,5 +72,12 @@ class CartController extends Controller
         $cart->delete();
 
         return $this->success('', 'Successfully', 200);
+    }
+
+    public function count()
+    {
+        $count = Cart::where('user_id', Auth::user()->id)->sum('qty');
+
+        return $this->success($count, 'ok', 200);
     }
 }

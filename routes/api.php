@@ -49,6 +49,7 @@ Route::group(['middleware' => ['allow-cors', 'verified', 'auth:sanctum']], funct
     Route::get('city/{id}', [RajaongkirController::class, 'getCity']);
     Route::get('postalcode/{id}', [RajaongkirController::class, 'getPostalCode']);
     Route::post('changepassword', [AuthController::class, 'changePassword']);
+    Route::get('cart/count', [CartController::class, 'count']);
 });
 
 // Protected Routes Only Admin

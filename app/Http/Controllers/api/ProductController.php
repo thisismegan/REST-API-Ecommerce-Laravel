@@ -22,7 +22,7 @@ class ProductController extends Controller
         $limit = request('limit');
         $limit ? $limit : $limit = 12;
 
-        $products = Product::with('image')->search(request(['keyword']))->category(request(['category']))->limit($limit)->get();
+        $products = Product::with('thumbnail')->search(request(['keyword']))->category(request(['category']))->limit($limit)->get();
         $data = [
             'products' => $products,
             'total'    => Product::all()->count()

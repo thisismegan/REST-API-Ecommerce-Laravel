@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AddressStoreRequest;
 use App\Http\Resources\AddressResource;
 use App\Models\Address;
+use App\Models\User;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -30,7 +31,10 @@ class AddressController extends Controller
     public function store(AddressStoreRequest $request)
     {
 
-        $request->validated($request->all());
+        $count = Address::where('user_id', Auth::user()->id)->count();
+        if ($count >= 2) {
+            return $this->failed('', 'Kuota alamat maksimal 2', 400);
+        }
 
         $address = Address::create([
             'user_id'       => Auth::user()->id,
@@ -47,21 +51,20 @@ class AddressController extends Controller
     public function show($id)
     {
 
-        $address = Address::where('id', $id)->where('user_id', Auth::user()->id)->get();
+        $address = Address::with('city')->where('id', $id)->where('user_id', Auth::user()->id)->first();
 
-        if ($address->count() < 1) {
-            return $this->failed('', 'Address not found', 404);
+        if ($address) {
+            return $this->success($address, 'Request was successfully', 200);
+        } else {
+            return $this->failed('', 'Not Found', 404);
         }
-        return $this->success([
-            'address' => $address
-        ], 'Request was successfully', 200);
     }
 
 
     public function update(Request $request, Address $address)
     {
         if (Auth::user()->id !== $address->user_id) {
-            return $this->failed('', "Access Denied!", 401);
+            return $this->failed('', "Access Denied!", 500);
         }
 
         $validator = Validator::make($request->all(), [
@@ -78,7 +81,7 @@ class AddressController extends Controller
 
         $address->update($request->all());
 
-        return $this->success(new AddressResource($address), 'Address has been updated', 200);
+        return $this->success(new AddressResource($address), 'Address has been updated', 201);
     }
 
     public function destroy(Address $address)
